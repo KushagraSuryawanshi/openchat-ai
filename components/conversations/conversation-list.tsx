@@ -2,6 +2,7 @@
 
 import { useConversations } from "@/hooks/use-conversations";
 import { Button } from "@/components/ui/button";
+import { useCreateConversation } from "@/hooks/use-create-conversation";
 
 export function ConversationList() {
   const {
@@ -13,11 +14,18 @@ export function ConversationList() {
     isFetchingNextPage,
   } = useConversations();
 
+  //renaming ispending cuz we used it just above
+  const { mutate, isPending: isCreating } = useCreateConversation();
+
   const conversations = data?.pages.flatMap((page) => page.conversations) ?? [];
 
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Conversations</h2>
+
+      <Button type="button" onClick={() => mutate()} disabled={isCreating}>
+        {isCreating ? "Creating..." : "New Chat"}
+      </Button>
 
       {isPending ? (
         <p>Loading conversations...</p>
