@@ -9,7 +9,7 @@ async function createConversation() {
   if (!response.ok) {
     throw new Error("Failed to create conversation.");
   }
-  return response.json;
+  return response.json();
 }
 
 export function useCreateConversation() {

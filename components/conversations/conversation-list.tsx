@@ -3,6 +3,8 @@
 import { useConversations } from "@/hooks/use-conversations";
 import { Button } from "@/components/ui/button";
 import { useCreateConversation } from "@/hooks/use-create-conversation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function ConversationList() {
   const {
@@ -14,8 +16,25 @@ export function ConversationList() {
     isFetchingNextPage,
   } = useConversations();
 
-  //renaming ispending cuz we used it just above
-  const { mutate, isPending: isCreating } = useCreateConversation();
+  //renaming isPending and isError cuz we used it just above
+  const {
+    mutateAsync,
+    isPending: isCreating,
+    isError: isCreatingError,
+  } = useCreateConversation();
+
+  const router = useRouter();
+
+  async function handleNewChat() {
+    try {
+      const result = await mutateAsync();
+      router.push(`/c/${result.conversation.id}`);
+    } catch {
+      {
+        isCreatingError && <p>Error creating conversation</p>;
+      }
+    }
+  }
 
   const conversations = data?.pages.flatMap((page) => page.conversations) ?? [];
 
@@ -23,7 +42,7 @@ export function ConversationList() {
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Conversations</h2>
 
-      <Button type="button" onClick={() => mutate()} disabled={isCreating}>
+      <Button type="button" onClick={handleNewChat} disabled={isCreating}>
         {isCreating ? "Creating..." : "New Chat"}
       </Button>
 
@@ -34,7 +53,12 @@ export function ConversationList() {
       ) : (
         <ul className="space-y-2">
           {conversations.map((conversation) => (
-            <li key={conversation.id}>{conversation.title}</li>
+            <li key={conversation.id}>
+              {" "}
+              <Link href={`/c/${conversation.id}`}>
+                {conversation.title}
+              </Link>{" "}
+            </li>
           ))}
         </ul>
       )}
