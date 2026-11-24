@@ -196,3 +196,65 @@
     @apply font-sans;
   }
 }
+
+/* Workspace surfaces are scoped so authentication screens retain their theme. */
+.chat-shell,
+[data-slot="sheet-content"][data-sidebar="sidebar"] {
+  --workspace-accent: oklch(0.46 0.065 165);
+  --background: oklch(0.99 0.003 85);
+  --foreground: oklch(0.25 0.008 65);
+  --card: oklch(0.97 0.005 85);
+  --muted: oklch(0.94 0.005 85);
+  --muted-foreground: oklch(0.49 0.009 65);
+  --border: oklch(0.9 0.007 85);
+  --sidebar: oklch(0.965 0.005 85);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: oklch(0.925 0.022 165);
+  --sidebar-accent-foreground: oklch(0.35 0.055 165);
+  --sidebar-border: var(--border);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.dark .chat-shell,
+.dark [data-slot="sheet-content"][data-sidebar="sidebar"] {
+  --workspace-accent: oklch(0.74 0.07 165);
+  --background: oklch(0.205 0.004 65);
+  --foreground: oklch(0.92 0.006 85);
+  --card: oklch(0.24 0.004 65);
+  --muted: oklch(0.28 0.004 65);
+  --muted-foreground: oklch(0.69 0.008 85);
+  --border: oklch(0.31 0.005 65);
+  --sidebar: oklch(0.175 0.004 65);
+  --sidebar-accent: oklch(0.28 0.025 165);
+  --sidebar-accent-foreground: oklch(0.84 0.045 165);
+}
+
+.welcome-art {
+  background: radial-gradient(ellipse at center, color-mix(in oklab, var(--workspace-accent) 12%, transparent), transparent 68%);
+}
+
+.chat-shell [data-slot="sidebar-header"],
+[data-slot="sheet-content"][data-sidebar="sidebar"] [data-slot="sidebar-header"] {
+  background: radial-gradient(ellipse at top left, color-mix(in oklab, var(--workspace-accent) 9%, transparent), transparent 75%);
+}
+
+.chat-shell [data-slot="sidebar-menu-button"][data-active],
+[data-slot="sheet-content"][data-sidebar="sidebar"] [data-slot="sidebar-menu-button"][data-active] {
+  box-shadow: inset 2px 0 var(--workspace-accent);
+}
+
+.chat-shell [data-slot="sidebar-menu-button"][data-active] > svg,
+[data-slot="sheet-content"][data-sidebar="sidebar"] [data-slot="sidebar-menu-button"][data-active] > svg {
+  color: var(--workspace-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-shell *,
+  [data-slot="sheet-content"][data-sidebar="sidebar"],
+  [data-slot="sheet-content"][data-sidebar="sidebar"] *,
+  [data-slot="sheet-overlay"] {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
