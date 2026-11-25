@@ -1,3 +1,4 @@
+import ConversationView from "@/components/chat/conversation-view";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { headers } from "next/headers";
@@ -38,11 +39,7 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
     <div className="mx-auto w-full max-w-3xl px-5 py-10 sm:px-8 sm:py-14">
       <p className="mb-3 text-xs font-medium tracking-widest text-muted-foreground uppercase">Conversation</p>
       <h1 className="mb-8 text-2xl font-medium tracking-tight [overflow-wrap:anywhere]">{conversation.title}</h1>
-      <ul className="space-y-6 text-sm leading-7">
-        {conversation.messages.map((el) => (
-          <li key={el.id} className="whitespace-pre-wrap [overflow-wrap:anywhere]">{el.content}</li>
-        ))}
-      </ul>
+      <ConversationView conversationId={conversation.id} messages={conversation.messages}/>
     </div>
   );
 };
