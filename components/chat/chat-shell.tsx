@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/chat/brand-logo";
 import { ConversationList } from "@/components/conversations/conversation-list";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -26,6 +27,7 @@ function ChatNavigation({
   children: ReactNode;
 }) {
   const { isMobile, openMobile, open, setOpenMobile } = useSidebar();
+  const isConversation = usePathname().startsWith("/c/");
 
   return (
     <>
@@ -34,7 +36,7 @@ function ChatNavigation({
           className="flex h-full min-h-0 flex-col"
           inert={!isMobile && !open}
         >
-          <SidebarHeader className="gap-6 px-4 pt-5 pb-3">
+          <SidebarHeader className="gap-6 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-3">
             <div className="flex items-center justify-between gap-2">
               <Link
                 href="/"
@@ -42,7 +44,7 @@ function ChatNavigation({
                 className="flex min-h-11 items-center gap-2.5 rounded-lg font-semibold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <BrandLogo className="size-8 shrink-0 text-black dark:text-white" />
-                <span className="whitespace-nowrap">OpenChat AI</span>
+                <span className="whitespace-nowrap [text-box:trim-both_cap_alphabetic]">OpenChat AI</span>
               </Link>
               <SidebarTrigger
                 className="size-11 text-muted-foreground"
@@ -67,15 +69,17 @@ function ChatNavigation({
         tabIndex={-1}
         className="min-h-0 min-w-0 outline-none"
       >
-        <header className="flex h-18 shrink-0 items-center gap-3 border-b border-border/50 px-4 sm:px-6">
-          <SidebarTrigger
-            className="size-11 text-muted-foreground"
-            aria-controls="chat-sidebar"
-            aria-expanded={isMobile ? openMobile : open}
-          />
-          <span className="text-sm font-medium">Your workspace</span>
-        </header>
-        <div className="chat-content flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
+        {!isConversation && (
+          <header className="flex min-h-[calc(3.5rem+max(1.25rem,env(safe-area-inset-top)))] shrink-0 items-center px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-3 sm:px-6">
+            <SidebarTrigger
+              hideWhenExpanded
+              className="size-11 text-muted-foreground"
+              aria-controls="chat-sidebar"
+              aria-expanded={isMobile ? openMobile : open}
+            />
+          </header>
+        )}
+        <div className={`chat-content flex min-h-0 flex-1 flex-col ${isConversation ? "overflow-clip" : "overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"}`}>
           {children}
         </div>
       </SidebarInset>

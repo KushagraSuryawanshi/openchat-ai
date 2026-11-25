@@ -11,6 +11,8 @@ import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
 import { ArrowDownIcon } from "lucide-react"
+import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
+import { ScrollBar } from "@/components/ui/scroll-area"
 
 function MessageScrollerProvider(
   props: React.ComponentProps<typeof MessageScrollerPrimitive.Provider>
@@ -39,14 +41,18 @@ function MessageScrollerViewport({
   ...props
 }: React.ComponentProps<typeof MessageScrollerPrimitive.Viewport>) {
   return (
-    <MessageScrollerPrimitive.Viewport
-      data-slot="message-scroller-viewport"
-      className={cn(
-        "size-full min-h-0 min-w-0 scroll-fade-b scrollbar-thin scrollbar-gutter-stable overflow-y-auto overscroll-contain contain-content data-autoscrolling:scrollbar-thumb-transparent data-autoscrolling:scrollbar-track-transparent data-pending-scroll:invisible",
-        className
-      )}
-      {...props}
-    />
+    <ScrollAreaPrimitive.Root className="relative size-full min-h-0 min-w-0">
+      <ScrollAreaPrimitive.Viewport
+        render={<MessageScrollerPrimitive.Viewport />}
+        data-slot="message-scroller-viewport"
+        className={cn(
+          "size-full min-h-0 min-w-0 overscroll-contain outline-none data-pending-scroll:invisible",
+          className
+        )}
+        {...props}
+      />
+      <ScrollBar className="data-vertical:w-1.5 [&_[data-slot=scroll-area-thumb]]:bg-muted-foreground/20 hover:[&_[data-slot=scroll-area-thumb]]:bg-muted-foreground/40 forced-colors:[&_[data-slot=scroll-area-thumb]]:bg-[CanvasText]" />
+    </ScrollAreaPrimitive.Root>
   )
 }
 

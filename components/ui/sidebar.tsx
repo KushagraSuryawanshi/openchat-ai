@@ -255,14 +255,18 @@ function Sidebar({
 function SidebarTrigger({
   className,
   onClick,
+  hideWhenExpanded = false,
   ...props
-}: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar()
+}: React.ComponentProps<typeof Button> & { hideWhenExpanded?: boolean }) {
+  const { toggleSidebar, isMobile, openMobile, open } = useSidebar()
+
+  if (hideWhenExpanded && !isMobile && open) return null
 
   return (
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
+      aria-expanded={isMobile ? openMobile : open}
       variant="ghost"
       size="icon-sm"
       className={cn(className)}

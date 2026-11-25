@@ -1,4 +1,5 @@
 import ConversationView from "@/components/chat/conversation-view";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { headers } from "next/headers";
@@ -36,9 +37,17 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-5 py-10 sm:px-8 sm:py-14">
-      <p className="mb-3 text-xs font-medium tracking-widest text-muted-foreground uppercase">Conversation</p>
-      <h1 className="mb-8 text-2xl font-medium tracking-tight [overflow-wrap:anywhere]">{conversation.title}</h1>
+    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
+      <header className="mx-auto flex min-h-[calc(3.5rem+max(1.25rem,env(safe-area-inset-top)))] min-w-0 w-full max-w-6xl shrink-0 items-center gap-3 pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(2rem,env(safe-area-inset-right))] sm:pl-[max(2rem,env(safe-area-inset-left))]">
+        <SidebarTrigger hideWhenExpanded className="size-11 shrink-0 text-muted-foreground" aria-controls="chat-sidebar" />
+        <h1
+          tabIndex={0}
+          title={conversation.title}
+          className="min-w-0 flex-1 truncate text-base font-medium tracking-tight outline-none [text-box:trim-both_cap_alphabetic] focus:whitespace-normal focus:[overflow-wrap:anywhere] focus-visible:ring-2 focus-visible:ring-ring sm:text-lg"
+        >
+          {conversation.title}
+        </h1>
+      </header>
       <ConversationView conversationId={conversation.id} messages={conversation.messages}/>
     </div>
   );

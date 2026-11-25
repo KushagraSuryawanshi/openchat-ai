@@ -242,7 +242,10 @@
 [data-sidebar="sidebar"][data-mobile="true"] [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]) {
   background-color: var(--sidebar-accent);
   color: var(--sidebar-accent-foreground);
-  box-shadow: inset 2px 0 var(--primary);
+
+  &:not(:focus-visible) {
+    box-shadow: none;
+  }
 }
 
 .chat-shell [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]) > svg,
