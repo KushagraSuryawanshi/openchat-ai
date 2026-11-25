@@ -1,13 +1,9 @@
 "use client";
 
+import ChatMessages from "./chat-message";
 import MessageComposer from "./message-composer";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-type Message = {
-  id: string;
-  role: string;
-  content: string;
-};
+import type { Message } from "@/types/chat";
 
 export default function ConversationView({
   messages,
@@ -62,21 +58,26 @@ export default function ConversationView({
 
   return (
     <>
-      <ul className="space-y-6 text-sm leading-7">
-        {displayedMessages.map((el) => (
-          <li
-            key={el.id}
-            className="whitespace-pre-wrap [overflow-wrap:anywhere]"
-          >
-            {el.role}
-            {el.content}
-          </li>
+      <ul
+        aria-label="Conversation messages"
+        className="mb-10 space-y-8 text-sm leading-relaxed text-foreground sm:space-y-10 sm:text-base"
+      >
+        {displayedMessages.map((message) => (
+          <ChatMessages key={message.id} message={message} />
         ))}
       </ul>
       {isSendingError && (
         <p role="alert">Failed to send message. Please try again.</p>
       )}
-      <MessageComposer onSend={handleSend} isSending={isSending} />
+      <MessageComposer
+        onSend={handleSend}
+        isSending={isSending}
+        placeholder={
+          displayedMessages.length === 0
+            ? "What are we cooking today?"
+            : "Write a message..."
+        }
+      />
     </>
   );
 }

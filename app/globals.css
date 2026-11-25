@@ -209,8 +209,8 @@
   --border: oklch(0.9 0.007 85);
   --sidebar: oklch(0.965 0.005 85);
   --sidebar-foreground: var(--foreground);
-  --sidebar-accent: oklch(0.925 0.022 165);
-  --sidebar-accent-foreground: oklch(0.35 0.055 165);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--border);
   font-family: var(--font-geist-sans), sans-serif;
 }
@@ -225,8 +225,8 @@
   --muted-foreground: oklch(0.69 0.008 85);
   --border: oklch(0.31 0.005 65);
   --sidebar: oklch(0.175 0.004 65);
-  --sidebar-accent: oklch(0.28 0.025 165);
-  --sidebar-accent-foreground: oklch(0.84 0.045 165);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
 }
 
 .welcome-art {
@@ -238,14 +238,16 @@
   background: radial-gradient(ellipse at top left, color-mix(in oklab, var(--workspace-accent) 9%, transparent), transparent 75%);
 }
 
-.chat-shell [data-slot="sidebar-menu-button"][data-active],
-[data-slot="sheet-content"][data-sidebar="sidebar"] [data-slot="sidebar-menu-button"][data-active] {
-  box-shadow: inset 2px 0 var(--workspace-accent);
+.chat-shell [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]),
+[data-sidebar="sidebar"][data-mobile="true"] [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]) {
+  background-color: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+  box-shadow: inset 2px 0 var(--primary);
 }
 
-.chat-shell [data-slot="sidebar-menu-button"][data-active] > svg,
-[data-slot="sheet-content"][data-sidebar="sidebar"] [data-slot="sidebar-menu-button"][data-active] > svg {
-  color: var(--workspace-accent);
+.chat-shell [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]) > svg,
+[data-sidebar="sidebar"][data-mobile="true"] [data-slot="sidebar-menu-button"][data-active]:not([data-active="false"]) > svg {
+  color: var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
