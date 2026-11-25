@@ -4,8 +4,10 @@ import { type SubmitEvent, useState } from "react";
 
 export default function MessageComposer({
   onSend,
+  isSending,
 }: {
   onSend: (message: string) => Promise<void>;
+  isSending: boolean;
 }) {
   const [text, setText] = useState("");
 
@@ -14,12 +16,12 @@ export default function MessageComposer({
 
     const content = text.trim();
 
-    if (!content) return;
+    if (!content || isSending) return;
     try {
       await onSend(content);
       setText("");
-    } catch (error) {
-      //Preserve the draft when sending fails
+    } catch {
+      //Preserve the draft when sending fails.
     }
   };
 
@@ -28,8 +30,9 @@ export default function MessageComposer({
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={isSending}
       ></textarea>
-      <button>Send</button>
+      <button disabled={isSending}>Send</button>
     </form>
   );
 }

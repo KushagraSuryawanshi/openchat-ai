@@ -1,7 +1,7 @@
 "use client";
 
 import MessageComposer from "./message-composer";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Message = {
   id: string;
@@ -31,27 +31,34 @@ export default function ConversationView({
   const queryClient = useQueryClient();
 
   const handleSend = async (message: string) => {
-    const response = await fetch(
-      `/api/conversations/${conversationId}/messages`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: message }),
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error("Error sending response");
-    }
-    const data = await response.json();
+    const savedMessage = await mutateAsync(message);
 
     queryClient.setQueryData<Message[]>(
       ["conversation-messages", conversationId],
-      (prev) => [...(prev ?? []), data.message],
+      (prev) => [...(prev ?? []), savedMessage],
     );
   };
+  const {
+    mutateAsync,
+    isPending: isSending,
+    isError: isSendingError,
+  } = useMutation({
+    mutationFn: async (message: string) => {
+      const response = await fetch(
+        `/api/conversations/${conversationId}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: message }),
+        },
+      );
+      if (!response.ok) throw new Error("Failed to send message");
+      const data = await response.json();
+      return data.message;
+    },
+  });
 
   return (
     <>
@@ -66,7 +73,10 @@ export default function ConversationView({
           </li>
         ))}
       </ul>
-      <MessageComposer onSend={handleSend} />
+      {isSendingError && (
+        <p role="alert">Failed to send message. Please try again.</p>
+      )}
+      <MessageComposer onSend={handleSend} isSending={isSending} />
     </>
   );
 }
