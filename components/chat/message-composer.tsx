@@ -5,19 +5,22 @@ import { type SubmitEvent, useState } from "react";
 export default function MessageComposer({
   onSend,
 }: {
-  onSend: (message: string) => void;
+  onSend: (message: string) => Promise<void>;
 }) {
   const [text, setText] = useState("");
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const content = text.trim();
 
     if (!content) return;
-
-    onSend(content);
-    setText("");
+    try {
+      await onSend(content);
+      setText("");
+    } catch (error) {
+      //Preserve the draft when sending fails
+    }
   };
 
   return (
