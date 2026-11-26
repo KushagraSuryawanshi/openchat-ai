@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { BrandLogo } from "@/components/chat/brand-logo";
 import { ConversationList } from "@/components/conversations/conversation-list";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import {
   Sidebar,
@@ -33,7 +34,7 @@ function ChatNavigation({
     <>
       <Sidebar id="chat-sidebar" className="border-sidebar-border/60">
         <div
-          className="flex h-full min-h-0 flex-col"
+          className="group/sidebar-hover flex h-full min-h-0 flex-col"
           inert={!isMobile && !open}
         >
           <SidebarHeader className="gap-6 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-3">
@@ -53,8 +54,10 @@ function ChatNavigation({
               />
             </div>
           </SidebarHeader>
-          <SidebarContent className="overscroll-contain px-3">
-            <ConversationList />
+          <SidebarContent className="overflow-hidden">
+            <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]]:overscroll-contain [&_[data-slot=scroll-area-viewport]]:px-3 [&_[data-slot=scroll-area-scrollbar]]:left-0! [&_[data-slot=scroll-area-scrollbar]]:right-auto! [&_[data-slot=scroll-area-scrollbar]]:w-1.5 [&_[data-slot=scroll-area-scrollbar]]:pointer-events-none [&_[data-slot=scroll-area-scrollbar]]:opacity-0 group-hover/sidebar-hover:[&_[data-slot=scroll-area-scrollbar]]:pointer-events-auto group-hover/sidebar-hover:[&_[data-slot=scroll-area-scrollbar]]:opacity-100 [&_[data-slot=scroll-area-thumb]]:bg-muted-foreground/20 hover:[&_[data-slot=scroll-area-thumb]]:bg-muted-foreground/40">
+              <ConversationList />
+            </ScrollArea>
           </SidebarContent>
           <SidebarFooter className="gap-3 border-t border-sidebar-border/60 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex min-w-0 items-center gap-2">

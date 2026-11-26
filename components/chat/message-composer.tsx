@@ -42,7 +42,21 @@ export default function MessageComposer({
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            disabled={isSending}
+            onKeyDown={(e) => {
+              // keyCode 229 also guards Safari's IME confirmation event.
+              if (
+                e.key === "Enter" &&
+                !e.shiftKey &&
+                !e.repeat &&
+                !e.nativeEvent.isComposing &&
+                e.nativeEvent.keyCode !== 229
+              ) {
+                e.preventDefault();
+
+                e.currentTarget.form?.requestSubmit();
+              }
+            }}
+            readOnly={isSending}
             rows={1}
             placeholder={placeholder}
             className="no-scrollbar field-sizing-content min-h-14 w-full resize-none overflow-y-auto rounded-[1rem] border-0 bg-transparent px-4 pt-3.5 pb-14 text-base leading-6 text-foreground shadow-none placeholder-shown:pr-16 placeholder-shown:pb-3.5 focus-visible:ring-0 disabled:bg-transparent motion-reduce:transition-none md:text-base dark:bg-transparent dark:disabled:bg-transparent"

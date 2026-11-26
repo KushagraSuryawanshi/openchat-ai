@@ -43,7 +43,7 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
         <h1
           tabIndex={0}
           title={conversation.title}
-          className="min-w-0 flex-1 truncate text-base font-medium tracking-tight outline-none [text-box:trim-both_cap_alphabetic] focus:whitespace-normal focus:[overflow-wrap:anywhere] focus-visible:ring-2 focus-visible:ring-ring sm:text-lg"
+          className="min-w-0 flex-1 truncate py-0.5 text-base font-medium tracking-tight outline-none focus:whitespace-normal focus:[overflow-wrap:anywhere] focus-visible:ring-2 focus-visible:ring-ring sm:text-lg"
         >
           {conversation.title}
         </h1>
