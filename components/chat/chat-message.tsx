@@ -1,8 +1,13 @@
-import type { Message } from "@/types/chat";
-export default function ChatMessages({ message }: { message: Message }) {
+import { UIMessage } from "ai";
+export default function ChatMessages({ message }: { message: UIMessage }) {
   const role = message.role.toUpperCase();
   const isUser = role === "USER";
   const isAssistant = role === "ASSISTANT";
+
+  const content = message.parts
+    .filter((part) => (part.type === "text"))
+    .map((part) => part.text)
+    .join("");
 
   return (
     <li
@@ -35,7 +40,7 @@ export default function ChatMessages({ message }: { message: Message }) {
           <span className="sr-only">: </span>
         </span>
         <div className="whitespace-pre-wrap [overflow-wrap:anywhere]">
-          {message.content}
+          {content}
         </div>
       </div>
     </li>

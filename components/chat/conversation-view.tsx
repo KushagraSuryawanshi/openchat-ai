@@ -2,7 +2,6 @@
 
 import ChatMessages from "./chat-message";
 import MessageComposer from "./message-composer";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Message } from "@/types/chat";
 import {
   MessageScroller,
@@ -10,6 +9,8 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
+import { UIMessage, DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
 
 export default function ConversationView({
   messages,
@@ -18,49 +19,35 @@ export default function ConversationView({
   messages: Message[];
   conversationId: string;
 }) {
-  const { data: displayedMessages } = useQuery<Message[]>({
-    queryKey: ["conversation-messages", conversationId],
-    queryFn: async () => {
-      const response = await fetch(`/api/conversations/${conversationId}`);
-      if (!response.ok) throw new Error("Failed to fetch messages");
-      const data = await response.json();
-      return data.conversation.messages;
-    },
-    initialData: messages,
-    staleTime: 30_000,
-  });
+  const initialMessages: UIMessage[] = messages.map((el) => ({
+    id: el.id,
+    role: el.role === "USER" ? "user" : "assistant",
+    parts: [{ type: "text", text: el.content }],
+  }));
 
-  const queryClient = useQueryClient();
+  const {
+    messages: chatMessages,
+    sendMessage,
+    status,
+    error,
+  } = useChat({
+    id: conversationId,
+    messages: initialMessages,
+    transport: new DefaultChatTransport({
+      api: `/api/conversations/${conversationId}/messages`,
+      prepareSendMessagesRequest: ({ messages }) => ({
+        body: {
+          content:
+            messages.at(-1)?.parts.find((part) => part.type === "text")?.text ??
+            "",
+        },
+      }),
+    }),
+  });
 
   const handleSend = async (message: string) => {
-    const savedMessage = await mutateAsync(message);
-
-    queryClient.setQueryData<Message[]>(
-      ["conversation-messages", conversationId],
-      (prev) => [...(prev ?? []), savedMessage],
-    );
+    await sendMessage({ text: message });
   };
-  const {
-    mutateAsync,
-    isPending: isSending,
-    isError: isSendingError,
-  } = useMutation({
-    mutationFn: async (message: string) => {
-      const response = await fetch(
-        `/api/conversations/${conversationId}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content: message }),
-        },
-      );
-      if (!response.ok) throw new Error("Failed to send message");
-      const data = await response.json();
-      return data.message;
-    },
-  });
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -77,7 +64,7 @@ export default function ConversationView({
           >
             <MessageScrollerContent className="mx-auto w-full max-w-6xl py-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(2rem,env(safe-area-inset-right))] sm:pl-[max(2rem,env(safe-area-inset-left))]">
               <ul className="space-y-8 text-sm leading-relaxed text-foreground sm:space-y-10 sm:text-base">
-                {displayedMessages.map((message) => (
+                {chatMessages.map((message) => (
                   <ChatMessages key={message.id} message={message} />
                 ))}
               </ul>
@@ -86,14 +73,16 @@ export default function ConversationView({
         </MessageScroller>
       </MessageScrollerProvider>
       <div className="mx-auto w-full max-w-3xl shrink-0 pt-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pt-4 sm:pr-[max(2rem,env(safe-area-inset-right))] sm:pl-[max(2rem,env(safe-area-inset-left))]">
-        {isSendingError && (
-          <p role="alert" className="mb-2">Failed to send message. Please try again.</p>
+        {error && (
+          <p role="alert" className="mb-2">
+            Failed to send message. Please try again.
+          </p>
         )}
         <MessageComposer
           onSend={handleSend}
-          isSending={isSending}
+          isSending={status === "submitted" || status === "streaming"}
           placeholder={
-            displayedMessages.length === 0
+            chatMessages.length === 0
               ? "What are we cooking today?"
               : "Write a message..."
           }

@@ -29,7 +29,14 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
 
   const conversation = await prisma.conversation.findFirst({
     where: { id, userId: session.user.id },
-    include: { messages: { orderBy: { createdAt: "asc" } } },
+    include: {
+      messages: {
+        where: {
+          role: { in: ["USER", "ASSISTANT"] },
+        },
+        orderBy: { createdAt: "asc" },
+      },
+    },
   });
 
   if (!conversation) {
@@ -39,7 +46,11 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <header className="mx-auto flex min-h-[calc(3.5rem+max(1.25rem,env(safe-area-inset-top)))] min-w-0 w-full max-w-6xl shrink-0 items-center gap-3 pt-[max(1.25rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(2rem,env(safe-area-inset-right))] sm:pl-[max(2rem,env(safe-area-inset-left))]">
-        <SidebarTrigger hideWhenExpanded className="size-11 shrink-0 text-muted-foreground" aria-controls="chat-sidebar" />
+        <SidebarTrigger
+          hideWhenExpanded
+          className="size-11 shrink-0 text-muted-foreground"
+          aria-controls="chat-sidebar"
+        />
         <h1
           tabIndex={0}
           title={conversation.title}
@@ -48,7 +59,10 @@ const AuthenticatedChat = async ({ params }: AuthenticatedChatProps) => {
           {conversation.title}
         </h1>
       </header>
-      <ConversationView conversationId={conversation.id} messages={conversation.messages}/>
+      <ConversationView
+        conversationId={conversation.id}
+        messages={conversation.messages}
+      />
     </div>
   );
 };

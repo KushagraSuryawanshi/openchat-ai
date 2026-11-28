@@ -1,6 +1,13 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { z } from "zod";
+import {
+  type ModelMessage,
+  streamText,
+  toUIMessageStream,
+  createUIMessageStreamResponse,
+} from "ai";
+import { openai } from "@ai-sdk/openai";
 
 const contentSchema = z.object({
   content: z.string().trim().min(1).max(4000),
@@ -40,7 +47,7 @@ export async function POST(
   if (!parsedBody.success) {
     return Response.json({ error: parsedBody.error }, { status: 400 });
   }
-  const message = await prisma.message.create({
+  await prisma.message.create({
     data: {
       conversationId: conversation.id,
       role: "USER",
@@ -48,5 +55,49 @@ export async function POST(
     },
   });
 
-  return Response.json({ message }, { status: 201 });
+  const history = await prisma.message.findMany({
+    where: {
+      conversationId: conversation.id,
+      role: { in: ["USER", "ASSISTANT"] },
+    },
+    orderBy: { createdAt: "asc" },
+    select: {
+      role: true,
+      content: true,
+    },
+  });
+
+  const modelMessages: ModelMessage[] = history.map((el) => ({
+    role: el.role === "USER" ? "user" : "assistant",
+    content: el.content,
+  }));
+
+  const result = streamText({
+    model: openai("gpt-4.1-mini"),
+    messages: modelMessages,
+    onEnd: async ({ text, finishReason }) => {
+      if (finishReason !== "stop" || !text.trim()) return;
+      try {
+        await prisma.message.create({
+          data: {
+            conversationId: conversation.id,
+            role: "ASSISTANT",
+            content: text,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to persist assistant response", {
+          conversationId: conversation.id,
+          error,
+        });
+        throw error;
+      }
+    },
+  });
+
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream({
+      stream: result.stream,
+    }),
+  });
 }
