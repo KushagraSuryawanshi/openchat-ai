@@ -24,8 +24,8 @@ export default function MessageComposer({
 
     if (!content || isSending) return;
     try {
-      await onSend(content);
       setText("");
+      await onSend(content);
     } catch {
       //Preserve the draft when sending fails.
     }

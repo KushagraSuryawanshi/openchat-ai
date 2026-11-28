@@ -2,15 +2,21 @@
 
 import ChatMessages from "./chat-message";
 import MessageComposer from "./message-composer";
-import type { Message } from "@/types/chat";
 import {
   MessageScroller,
   MessageScrollerContent,
+  MessageScrollerItem,
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
 import { UIMessage, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
+
+type Message = {
+  id: string;
+  role: string;
+  content: string;
+};
 
 export default function ConversationView({
   messages,
