@@ -5,12 +5,12 @@ import MessageComposer from "./message-composer";
 import {
   MessageScroller,
   MessageScrollerContent,
-  MessageScrollerItem,
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
 import { UIMessage, DefaultChatTransport } from "ai";
 import { useChat } from "@ai-sdk/react";
+import { useEffect } from "react";
 
 type Message = {
   id: string;
@@ -54,6 +54,21 @@ export default function ConversationView({
   const handleSend = async (message: string) => {
     await sendMessage({ text: message });
   };
+
+
+  useEffect(() => {
+    const initialMessage = sessionStorage.getItem(
+      `initial-prompt:${conversationId}`,
+    );
+
+    if (!initialMessage) return;
+
+    sessionStorage.removeItem(`initial-prompt:${conversationId}`);
+
+    queueMicrotask(() => {
+      void sendMessage({ text: initialMessage }).catch(console.error);
+    });
+  }, [conversationId, sendMessage]);
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
